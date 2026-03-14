@@ -1,0 +1,927 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useProfile } from "../context/ProfileContext";
+import { LOCATION_DATA } from "../data/locationData";
+
+/* ─── constants ──────────────────────────────────────────────── */
+const ACCENT  = "#c2852a";
+const DARK    = "#1c1917";
+const BORDER  = "#ece8e1";
+const MUTED   = "#9a8c7a";
+
+const STEPS = [
+  { id: 1, label: "Basic Info",     icon: "👤" },
+  { id: 2, label: "Personal",       icon: "🏠" },
+  { id: 3, label: "Religion",       icon: "🕌" },
+  { id: 4, label: "Family",         icon: "👨‍👩‍👧" },
+  { id: 5, label: "Education",      icon: "🎓" },
+  { id: 6, label: "Lifestyle",      icon: "🌿" },
+  { id: 7, label: "Partner Prefs",  icon: "💑" },
+  { id: 8, label: "Photos",         icon: "📸" },
+];
+
+/* ─── small shared primitives ────────────────────────────────── */
+function Label({ children, required }) {
+  return (
+    <label className="block text-[0.68rem] font-bold tracking-[0.1em] uppercase text-[#9a8c7a] mb-1.5">
+      {children}{required && <span className="text-[#c2852a] ml-0.5">*</span>}
+    </label>
+  );
+}
+
+function Input({ label, required, type = "text", placeholder, value, onChange, ...rest }) {
+  const [focus, setFocus] = useState(false);
+  return (
+    <div className="mb-4">
+      {label && <Label required={required}>{label}</Label>}
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        style={{
+          width: "100%", padding: "9px 13px",
+          border: `1.5px solid ${focus ? ACCENT : BORDER}`,
+          borderRadius: 9, fontFamily: "'Inter', sans-serif",
+          fontSize: "0.83rem", color: DARK,
+          outline: "none", transition: "border-color 0.18s",
+          background: "white",
+        }}
+        {...rest}
+      />
+    </div>
+  );
+}
+
+function Select({ label, required, value, onChange, options, placeholder }) {
+  const [focus, setFocus] = useState(false);
+  return (
+    <div className="mb-4">
+      {label && <Label required={required}>{label}</Label>}
+      <select
+        value={value}
+        onChange={onChange}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        style={{
+          width: "100%", padding: "9px 13px",
+          border: `1.5px solid ${focus ? ACCENT : BORDER}`,
+          borderRadius: 9, fontFamily: "'Inter', sans-serif",
+          fontSize: "0.83rem", color: value ? DARK : MUTED,
+          outline: "none", cursor: "pointer",
+          transition: "border-color 0.18s", appearance: "none",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239a8c7a'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center",
+          paddingRight: 30, background: "white",
+        }}
+      >
+        <option value="">{placeholder || "Select…"}</option>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function Textarea({ label, required, placeholder, value, onChange, rows = 3 }) {
+  const [focus, setFocus] = useState(false);
+  return (
+    <div className="mb-4">
+      {label && <Label required={required}>{label}</Label>}
+      <textarea
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        rows={rows}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        style={{
+          width: "100%", padding: "9px 13px",
+          border: `1.5px solid ${focus ? ACCENT : BORDER}`,
+          borderRadius: 9, fontFamily: "'Inter', sans-serif",
+          fontSize: "0.83rem", color: DARK,
+          outline: "none", transition: "border-color 0.18s",
+          resize: "vertical", background: "white",
+        }}
+      />
+    </div>
+  );
+}
+
+function Chips({ label, options, selected, onToggle }) {
+  return (
+    <div className="mb-4">
+      {label && <Label>{label}</Label>}
+      <div className="flex flex-wrap gap-2">
+        {options.map(o => {
+          const active = selected.includes(o);
+          return (
+            <button
+              key={o}
+              type="button"
+              onClick={() => onToggle(o)}
+              className="text-[0.78rem] px-3 py-1.5 rounded-full border transition-all duration-150 cursor-pointer"
+              style={{
+                background: active ? ACCENT : "white",
+                color: active ? "white" : MUTED,
+                borderColor: active ? ACCENT : BORDER,
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              {o}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─── step forms ─────────────────────────────────────────────── */
+
+function Step1({ d, set }) {
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="First Name" required placeholder="Your first name" value={d.firstName} onChange={e => set("firstName", e.target.value)} />
+        <Input label="Last Name"  required placeholder="Your last name"  value={d.lastName}  onChange={e => set("lastName",  e.target.value)} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Date of Birth" required type="date" value={d.dob} onChange={e => set("dob", e.target.value)} />
+        <Select label="Gender" required value={d.gender} onChange={e => set("gender", e.target.value)}
+          options={["Male", "Female", "Other"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Marital Status" required value={d.maritalStatus} onChange={e => set("maritalStatus", e.target.value)}
+          options={["Never Married", "Divorced", "Widowed", "Awaiting Divorce"]} />
+        <Select label="Profile Created For" required value={d.profileFor} onChange={e => set("profileFor", e.target.value)}
+          options={["Self", "Son", "Daughter", "Brother", "Sister", "Relative", "Friend"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5">
+        <Input label="Height" placeholder="e.g. 5'7&quot;" value={d.height} onChange={e => set("height", e.target.value)} />
+        <Input label="Weight" placeholder="e.g. 70 kg"   value={d.weight} onChange={e => set("weight", e.target.value)} />
+        <Select label="Body Type" value={d.bodyType} onChange={e => set("bodyType", e.target.value)}
+          options={["Slim", "Average", "Athletic", "Heavy"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Complexion" value={d.complexion} onChange={e => set("complexion", e.target.value)}
+          options={["Very Fair", "Fair", "Wheatish", "Wheatish Brown", "Dark"]} />
+        <Input label="Mobile Number" required type="tel" placeholder="+91 98765 43210" value={d.mobile} onChange={e => set("mobile", e.target.value)} />
+      </div>
+      <Textarea label="About Yourself" required placeholder="Write a short bio about yourself, your interests, and what you are looking for..." value={d.about} onChange={e => set("about", e.target.value)} rows={4} />
+    </div>
+  );
+}
+
+function Step2({ d, set }) {
+  const countryData = LOCATION_DATA[d.country] || { states: [], cities: {} };
+  const stateList   = countryData.states || [];
+  const cityList    = d.currentState ? (countryData.cities[d.currentState] || []) : [];
+
+  const handleCountryChange = e => {
+    set("country",      e.target.value);
+    set("currentState", "");
+    set("currentCity",  "");
+  };
+
+  const handleStateChange = e => {
+    set("currentState", e.target.value);
+    set("currentCity",  "");
+  };
+
+  return (
+    <div>
+      {/* Row 1: Mother Tongue + Nationality */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Mother Tongue" required value={d.motherTongue} onChange={e => set("motherTongue", e.target.value)}
+          options={["Hindi","Marathi","Gujarati","Bengali","Tamil","Telugu","Kannada","Malayalam","Punjabi","Odia","Urdu","English","Other"]} />
+        <Select label="Nationality" value={d.nationality} onChange={e => set("nationality", e.target.value)}
+          options={["Indian","NRI","Foreign National"]} />
+      </div>
+
+      {/* Row 2: Country */}
+      <Select label="Country" value={d.country} onChange={handleCountryChange}
+        options={["India","USA","UK","Canada","Australia","UAE","Singapore","Germany","Other"]} />
+
+      {/* Row 3: State → City (cascading) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        {/* State — dropdown if data exists, text input otherwise */}
+        {stateList.length > 0 ? (
+          <Select label="Current State" value={d.currentState} onChange={handleStateChange}
+            options={stateList} placeholder="Select state…" />
+        ) : (
+          <Input label="Current State" placeholder="e.g. Maharashtra"
+            value={d.currentState} onChange={e => set("currentState", e.target.value)} />
+        )}
+
+        {/* City — dropdown if data exists for selected state, text input otherwise */}
+        {cityList.length > 0 ? (
+          <Select label="Current City" required value={d.currentCity}
+            onChange={e => set("currentCity", e.target.value)}
+            options={cityList} placeholder="Select city…" />
+        ) : (
+          <Input label="Current City" required placeholder="e.g. Mumbai"
+            value={d.currentCity} onChange={e => set("currentCity", e.target.value)} />
+        )}
+      </div>
+
+      {/* Row 4: Birth City + Time of Birth */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Birth City" placeholder="City of birth" value={d.birthCity} onChange={e => set("birthCity", e.target.value)} />
+        <Input label="Time of Birth" type="time" value={d.birthTime} onChange={e => set("birthTime", e.target.value)} />
+      </div>
+
+      {/* Row 5: Rashi + Nakshatra */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Rashi (Moon Sign)" value={d.rashi} onChange={e => set("rashi", e.target.value)}
+          options={["Mesh (Aries)","Vrishabh (Taurus)","Mithun (Gemini)","Kark (Cancer)","Simha (Leo)","Kanya (Virgo)","Tula (Libra)","Vrishchik (Scorpio)","Dhanu (Sagittarius)","Makar (Capricorn)","Kumbh (Aquarius)","Meen (Pisces)"]} />
+        <Select label="Nakshatra" value={d.nakshatra} onChange={e => set("nakshatra", e.target.value)}
+          options={["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishtha","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"]} />
+      </div>
+
+      {/* Row 6: Gotra + Manglik */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Gotra" placeholder="e.g. Kashyap, Bharadwaj" value={d.gotra} onChange={e => set("gotra", e.target.value)} />
+        <Select label="Manglik Status" value={d.manglik} onChange={e => set("manglik", e.target.value)}
+          options={["Manglik","Non-Manglik","Partial Manglik","Don't Know"]} />
+      </div>
+    </div>
+  );
+}
+
+function Step3({ d, set }) {
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Religion" required value={d.religion} onChange={e => set("religion", e.target.value)}
+          options={["Hindu","Muslim","Christian","Sikh","Buddhist","Jain","Parsi","Jewish","No Religion","Other"]} />
+        <Select label="Caste" value={d.caste} onChange={e => set("caste", e.target.value)}
+          options={["Brahmin","Kshatriya","Vaishya","Scheduled Caste","Scheduled Tribe","Other Backward Class","Kayastha","Rajput","Maratha","Jat","Patel","Naidu","Nair","Iyer","Iyengar","Sheikh","Syed","Ansari","Other"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Sub-Caste" placeholder="Enter sub-caste (optional)" value={d.subCaste} onChange={e => set("subCaste", e.target.value)} />
+        <Select label="Caste No Bar?" value={d.casteNoBar} onChange={e => set("casteNoBar", e.target.value)}
+          options={["Yes, open to all castes","No, same caste preferred"]} />
+      </div>
+      <Select label="Religious Practice" value={d.religiousPractice} onChange={e => set("religiousPractice", e.target.value)}
+        options={["Not Religious","Moderately Religious","Very Religious","Spiritual but not religious"]} />
+      <Input label="Community / Sect" placeholder="e.g. Sunni, Shaivite, Arya Samaj…" value={d.community} onChange={e => set("community", e.target.value)} />
+    </div>
+  );
+}
+
+function Step4({ d, set }) {
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Father's Name" placeholder="Father's full name" value={d.fatherName} onChange={e => set("fatherName", e.target.value)} />
+        <Select label="Father's Occupation" value={d.fatherOccupation} onChange={e => set("fatherOccupation", e.target.value)}
+          options={["Business","Service / Job","Retired","Not Employed","Deceased","Other"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Mother's Name" placeholder="Mother's full name" value={d.motherName} onChange={e => set("motherName", e.target.value)} />
+        <Select label="Mother's Occupation" value={d.motherOccupation} onChange={e => set("motherOccupation", e.target.value)}
+          options={["Homemaker","Business","Service / Job","Retired","Not Employed","Deceased","Other"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="No. of Brothers" value={d.brothers} onChange={e => set("brothers", e.target.value)}
+          options={["0","1","2","3","4","5+"]} />
+        <Select label="Brothers Married" value={d.brothersMarried} onChange={e => set("brothersMarried", e.target.value)}
+          options={["0","1","2","3","4","5+"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="No. of Sisters" value={d.sisters} onChange={e => set("sisters", e.target.value)}
+          options={["0","1","2","3","4","5+"]} />
+        <Select label="Sisters Married" value={d.sistersMarried} onChange={e => set("sistersMarried", e.target.value)}
+          options={["0","1","2","3","4","5+"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5">
+        <Select label="Family Type" value={d.familyType} onChange={e => set("familyType", e.target.value)}
+          options={["Nuclear","Joint","Extended"]} />
+        <Select label="Family Values" value={d.familyValues} onChange={e => set("familyValues", e.target.value)}
+          options={["Traditional","Moderate","Liberal"]} />
+        <Select label="Family Status" value={d.familyStatus} onChange={e => set("familyStatus", e.target.value)}
+          options={["Middle Class","Upper Middle Class","Rich / Affluent","High Net Worth"]} />
+      </div>
+      <Input label="Family Location / Native Place" placeholder="e.g. Pune, Maharashtra" value={d.familyLocation} onChange={e => set("familyLocation", e.target.value)} />
+    </div>
+  );
+}
+
+function Step5({ d, set }) {
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Highest Education" required value={d.education} onChange={e => set("education", e.target.value)}
+          options={["High School","Diploma","Bachelor's Degree","Master's Degree","MBA","MBBS / MD","PhD / Doctorate","CA / CS / CFA","Other"]} />
+        <Input label="Field of Study" placeholder="e.g. Computer Science, Commerce" value={d.fieldOfStudy} onChange={e => set("fieldOfStudy", e.target.value)} />
+      </div>
+      <Input label="College / University" placeholder="Name of institution" value={d.college} onChange={e => set("college", e.target.value)} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Employment Type" required value={d.employmentType} onChange={e => set("employmentType", e.target.value)}
+          options={["Private Sector","Government / PSU","Business / Self-Employed","Defence","Not Working","Student"]} />
+        <Input label="Occupation" required placeholder="e.g. Software Engineer, Doctor" value={d.occupation} onChange={e => set("occupation", e.target.value)} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Company / Organisation" placeholder="Where do you work?" value={d.company} onChange={e => set("company", e.target.value)} />
+        <Select label="Annual Income (₹)" value={d.income} onChange={e => set("income", e.target.value)}
+          options={["No Income","Below 2 Lakh","2–5 Lakh","5–10 Lakh","10–20 Lakh","20–30 Lakh","30–50 Lakh","50 Lakh – 1 Cr","Above 1 Cr"]} />
+      </div>
+      <Input label="Work Location" placeholder="City where you work" value={d.workLocation} onChange={e => set("workLocation", e.target.value)} />
+    </div>
+  );
+}
+
+const LANGUAGES = ["Hindi","English","Marathi","Tamil","Telugu","Kannada","Bengali","Gujarati","Punjabi","Malayalam","Odia","Urdu"];
+const HOBBIES   = ["Reading","Cooking","Travelling","Music","Dancing","Yoga","Sports","Art","Photography","Gardening","Movies","Gaming","Fitness","Meditation"];
+
+function Step6({ d, set, toggleChip }) {
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Diet" required value={d.diet} onChange={e => set("diet", e.target.value)}
+          options={["Vegetarian","Non-Vegetarian","Eggetarian","Vegan","Jain"]} />
+        <Select label="Smoking" value={d.smoking} onChange={e => set("smoking", e.target.value)}
+          options={["Non Smoker","Occasional","Regular"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Drinking" value={d.drinking} onChange={e => set("drinking", e.target.value)}
+          options={["Non Drinker","Occasional","Regular"]} />
+        <Select label="Fitness Level" value={d.fitness} onChange={e => set("fitness", e.target.value)}
+          options={["Very Active","Active","Moderately Active","Not Active"]} />
+      </div>
+      <Chips label="Languages Known" options={LANGUAGES} selected={d.languages} onToggle={v => toggleChip("languages", v)} />
+      <Chips label="Hobbies & Interests" options={HOBBIES} selected={d.hobbies} onToggle={v => toggleChip("hobbies", v)} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Own Vehicle?" value={d.vehicle} onChange={e => set("vehicle", e.target.value)}
+          options={["No","Two Wheeler","Car","Both"]} />
+        <Select label="Own Property?" value={d.property} onChange={e => set("property", e.target.value)}
+          options={["No","Flat / Apartment","Independent House","Plot / Land","Multiple Properties"]} />
+      </div>
+    </div>
+  );
+}
+
+function Step7({ d, set }) {
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Partner Min Age" value={d.partnerAgeMin} onChange={e => set("partnerAgeMin", e.target.value)}
+          options={Array.from({length: 33}, (_, i) => `${18 + i} years`)} />
+        <Select label="Partner Max Age" value={d.partnerAgeMax} onChange={e => set("partnerAgeMax", e.target.value)}
+          options={Array.from({length: 33}, (_, i) => `${18 + i} years`)} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Input label="Partner Min Height" placeholder="e.g. 5'2&quot;" value={d.partnerHeightMin} onChange={e => set("partnerHeightMin", e.target.value)} />
+        <Input label="Partner Max Height" placeholder="e.g. 5'8&quot;" value={d.partnerHeightMax} onChange={e => set("partnerHeightMax", e.target.value)} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Preferred Marital Status" value={d.partnerMaritalStatus} onChange={e => set("partnerMaritalStatus", e.target.value)}
+          options={["Never Married","Divorced","Widowed","Any"]} />
+        <Select label="Preferred Religion" value={d.partnerReligion} onChange={e => set("partnerReligion", e.target.value)}
+          options={["Hindu","Muslim","Christian","Sikh","Any","Other"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Preferred Caste" value={d.partnerCaste} onChange={e => set("partnerCaste", e.target.value)}
+          options={["Same Caste","Any Caste","Open to All"]} />
+        <Select label="Preferred Education" value={d.partnerEducation} onChange={e => set("partnerEducation", e.target.value)}
+          options={["Any","Graduate & Above","Post Graduate & Above","Doctorate"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Preferred Income (₹)" value={d.partnerIncome} onChange={e => set("partnerIncome", e.target.value)}
+          options={["No Preference","Above 2 Lakh","Above 5 Lakh","Above 10 Lakh","Above 20 Lakh"]} />
+        <Select label="Preferred Location" value={d.partnerLocation} onChange={e => set("partnerLocation", e.target.value)}
+          options={["Same City","Same State","Anywhere in India","Abroad OK","Any"]} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+        <Select label="Partner Diet Preference" value={d.partnerDiet} onChange={e => set("partnerDiet", e.target.value)}
+          options={["Vegetarian Only","Non-Veg OK","No Preference"]} />
+        <Select label="Manglik Preference" value={d.partnerManglik} onChange={e => set("partnerManglik", e.target.value)}
+          options={["Manglik Only","Non-Manglik Only","No Preference"]} />
+      </div>
+      <Textarea label="Partner Description" placeholder="Describe your ideal partner in your own words…" value={d.partnerDesc} onChange={e => set("partnerDesc", e.target.value)} rows={4} />
+    </div>
+  );
+}
+
+function Step8({ d, set }) {
+  const [verifying, setVerifying] = useState(false);
+
+  /* single profile photo */
+  const handlePhoto = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    set("photos", [url]);
+  };
+  const photo = d.photos && d.photos[0];
+
+  /* ID document upload — triggers mock verification */
+  const handleIdDoc = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    set("idDoc", file.name);
+    set("verified", false);   // reset while verifying
+    setVerifying(true);
+    // Simulate a 2.5s verification check
+    setTimeout(() => {
+      setVerifying(false);
+      set("verified", true);
+    }, 2500);
+  };
+
+  const docTypes = [
+    { icon: "🪪", label: "Aadhaar Card",  hint: "12-digit Aadhaar number" },
+    { icon: "💳", label: "PAN Card",       hint: "10-character PAN" },
+    { icon: "📕", label: "Passport",       hint: "Valid passport copy" },
+    { icon: "🚗", label: "Driving Licence", hint: "Front side of DL" },
+  ];
+
+  return (
+    <div>
+
+      {/* ── PROFILE PHOTO ── */}
+      <div className="mb-7">
+        <Label>Profile Photo</Label>
+        <p className="text-[0.78rem] text-[#9a8c7a] mb-4">
+          Upload a clear photo of yourself. This appears on your profile and in search results.
+        </p>
+        <div className="flex flex-col items-center gap-4">
+          {photo ? (
+            <div className="relative">
+              <img src={photo} alt="Profile"
+                className="w-32 h-32 rounded-2xl object-cover border-2 border-[#e8c98a] shadow-md" />
+              <button type="button" onClick={() => set("photos", [])}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-stone-800 text-white text-xs rounded-full flex items-center justify-center cursor-pointer border-2 border-white hover:bg-red-500 transition-colors">
+                ×
+              </button>
+              {d.verified && (
+                <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-[#4a7a4a] rounded-full flex items-center justify-center border-2 border-white text-white text-xs font-bold">
+                  ✓
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-[#f0ddb8] bg-[#fdf6ec] flex flex-col items-center justify-center">
+              <span className="text-4xl mb-1">👤</span>
+              <span className="text-[0.65rem] text-[#9a8c7a]">No photo yet</span>
+            </div>
+          )}
+          <label className="flex items-center gap-2 px-5 py-2 rounded-xl border border-[#e8c98a] bg-[#fdf6ec] text-[#c2852a] text-[0.8rem] font-semibold cursor-pointer hover:bg-[#f5e8cc] transition-colors">
+            <span>{photo ? "Change Photo" : "+ Upload Photo"}</span>
+            <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+          </label>
+        </div>
+      </div>
+
+      <div className="border-t border-[#f0ede9] my-5" />
+
+      {/* ── ID VERIFICATION ── */}
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <Label>ID Verification</Label>
+          {d.verified && (
+            <span className="inline-flex items-center gap-1 text-[0.68rem] font-bold px-2 py-0.5 rounded-full mb-1.5"
+              style={{ background: "#eaf4ea", color: "#4a7a4a" }}>
+              ✓ Verified
+            </span>
+          )}
+        </div>
+        <p className="text-[0.78rem] text-[#9a8c7a] mb-4">
+          Upload a government-issued ID to get a <strong className="text-[#4a7a4a]">✓ Verified</strong> badge on your profile.
+          This builds trust and gets you <strong>3× more responses</strong>.
+        </p>
+
+        {/* Doc type hints */}
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          {docTypes.map(dt => (
+            <div key={dt.label} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-[#ece8e1] bg-[#fdfcfa]">
+              <span className="text-lg">{dt.icon}</span>
+              <div>
+                <div className="text-[0.75rem] font-semibold text-[#1c1917]">{dt.label}</div>
+                <div className="text-[0.65rem] text-[#9a8c7a]">{dt.hint}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Upload area */}
+        {!d.idDoc ? (
+          <label className="flex items-center gap-4 border-2 border-dashed border-[#f0ddb8] rounded-xl p-4 cursor-pointer hover:border-[#c2852a] hover:bg-[#fdf9f3] transition-all">
+            <div className="w-10 h-10 rounded-xl bg-[#fdf6ec] flex items-center justify-center text-xl flex-shrink-0">📄</div>
+            <div className="flex-1">
+              <div className="text-[0.83rem] font-semibold text-[#1c1917]">Upload your ID document</div>
+              <div className="text-[0.72rem] text-[#9a8c7a]">JPG, PNG or PDF · Max 5 MB · Securely encrypted</div>
+            </div>
+            <div className="flex-shrink-0 text-[0.75rem] font-semibold text-[#c2852a] border border-[#f0ddb8] bg-[#fdf6ec] px-3 py-1.5 rounded-lg">
+              Browse
+            </div>
+            <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleIdDoc} />
+          </label>
+        ) : (
+          /* Uploaded state */
+          <div className="rounded-xl border overflow-hidden"
+            style={{ borderColor: d.verified ? "#b8d8b8" : "#f0ddb8" }}>
+
+            {/* File row */}
+            <div className="flex items-center gap-3 px-4 py-3"
+              style={{ background: d.verified ? "#f0f8f0" : "#fdf6ec" }}>
+              <span className="text-xl">📄</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[0.8rem] font-semibold text-[#1c1917] truncate">{d.idDoc}</div>
+                <div className="text-[0.68rem] text-[#9a8c7a]">Document uploaded</div>
+              </div>
+              {/* Status */}
+              {verifying ? (
+                <div className="flex items-center gap-1.5 text-[0.72rem] font-semibold text-[#c2852a]">
+                  <span className="inline-block w-3.5 h-3.5 border-2 border-[#c2852a] border-t-transparent rounded-full animate-spin" />
+                  Verifying…
+                </div>
+              ) : d.verified ? (
+                <div className="flex items-center gap-1 text-[0.72rem] font-bold text-[#4a7a4a]">
+                  <span className="w-5 h-5 bg-[#4a7a4a] rounded-full flex items-center justify-center text-white text-[0.6rem]">✓</span>
+                  Verified
+                </div>
+              ) : null}
+              {/* Remove */}
+              <button type="button"
+                onClick={() => { set("idDoc", ""); set("verified", false); }}
+                className="text-[#9a8c7a] hover:text-red-500 text-lg cursor-pointer bg-transparent border-none leading-none transition-colors">
+                ×
+              </button>
+            </div>
+
+            {/* Verified banner */}
+            {d.verified && (
+              <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: "#eaf4ea" }}>
+                <span className="text-base">🎉</span>
+                <p className="text-[0.75rem] font-semibold text-[#4a7a4a]">
+                  Identity verified! Your profile will show a <strong>✓ Verified</strong> badge.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Privacy note */}
+        <p className="text-[0.68rem] text-[#b0a090] mt-3 flex items-center gap-1">
+          🔒 Your ID is encrypted and never shared with other users. Used only for verification.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── initial data ───────────────────────────────────────────── */
+const initData = {
+  // step 1
+  firstName: "", lastName: "", dob: "", gender: "", maritalStatus: "", profileFor: "",
+  height: "", weight: "", bodyType: "", complexion: "", mobile: "", about: "",
+  // step 2
+  motherTongue: "", nationality: "", currentCity: "", currentState: "", country: "",
+  birthCity: "", birthTime: "", rashi: "", nakshatra: "", gotra: "", manglik: "",
+  // step 3
+  religion: "", caste: "", subCaste: "", casteNoBar: "", religiousPractice: "", community: "",
+  // step 4
+  fatherName: "", fatherOccupation: "", motherName: "", motherOccupation: "",
+  brothers: "", brothersMarried: "", sisters: "", sistersMarried: "",
+  familyType: "", familyValues: "", familyStatus: "", familyLocation: "",
+  // step 5
+  education: "", fieldOfStudy: "", college: "",
+  employmentType: "", occupation: "", company: "", income: "", workLocation: "",
+  // step 6
+  diet: "", smoking: "", drinking: "", fitness: "",
+  languages: [], hobbies: [], vehicle: "", property: "",
+  // step 7
+  partnerAgeMin: "", partnerAgeMax: "",
+  partnerHeightMin: "", partnerHeightMax: "",
+  partnerMaritalStatus: "", partnerReligion: "", partnerCaste: "",
+  partnerEducation: "", partnerIncome: "", partnerLocation: "",
+  partnerDiet: "", partnerManglik: "", partnerDesc: "",
+  // step 8
+  photos: [], idDoc: "", verified: false,
+};
+
+/* ─── main page ──────────────────────────────────────────────── */
+export default function CompleteProfile({ onClose }) {
+  const navigate        = useNavigate();
+  const { saveProfile } = useProfile();
+  const [step,  setStep]  = useState(1);
+  const [data,  setData]  = useState(initData);
+  const [toast, setToast] = useState(false);
+
+  const set = (key, val) => setData(d => ({ ...d, [key]: val }));
+
+  const toggleChip = (key, val) =>
+    setData(d => ({
+      ...d,
+      [key]: d[key].includes(val) ? d[key].filter(x => x !== val) : [...d[key], val],
+    }));
+
+  const pct  = Math.round(((step - 1) / STEPS.length) * 100);
+  const next = () => { if (step < STEPS.length) setStep(s => s + 1); };
+  const prev = () => { if (step > 1) setStep(s => s - 1); };
+
+  const save = () => {
+    saveProfile(data);
+    setToast(true);
+    setTimeout(() => {
+      setToast(false);
+      if (onClose) onClose();       // close modal if used as overlay
+      else navigate("/profile");    // fallback for standalone page
+    }, 2000);
+  };
+
+  // Close on Escape key
+  const handleKeyDown = (e) => { if (e.key === "Escape" && onClose) onClose(); };
+
+  const stepInfo = [
+    "Let's start with your basic information",
+    "Your location, birth details and astrological info",
+    "Your religious and community background",
+    "Tell us about your family",
+    "Your education and career details",
+    "Your lifestyle preferences and habits",
+    "What are you looking for in a partner?",
+    "Add photos to make your profile stand out",
+  ];
+
+  const card = (
+    <div
+      className="w-full max-w-2xl rounded-3xl overflow-hidden flex flex-col"
+      style={{
+        background: "white",
+        boxShadow: "0 8px 48px rgba(28,25,23,0.18)",
+        border: "1px solid #ece8e1",
+        maxHeight: "90vh",
+      }}
+    >
+      {/* ══ CARD HEADER ══ */}
+      <div style={{ background: DARK }}>
+        <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+          <div>
+            <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase mb-0.5" style={{ color: "#c2852a" }}>
+              Matrimony Profile
+            </p>
+            <h1 className="text-[1.25rem] font-bold text-white leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Complete Your Profile
+            </h1>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.72rem] font-bold"
+              style={{ background: "rgba(194,133,42,0.18)", color: "#e8c98a" }}>
+              <span>{STEPS[step-1].icon}</span>
+              <span>Step {step} of {STEPS.length}</span>
+            </div>
+            {/* Close button */}
+            {onClose && (
+              <button onClick={onClose}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all cursor-pointer border-none text-lg leading-none"
+                style={{ background: "transparent" }}
+                aria-label="Close">
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="px-6 pb-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[0.68rem] text-white/50">{STEPS[step-1].label}</span>
+            <span className="text-[0.68rem] font-bold" style={{ color: "#e8c98a" }}>{pct}%</span>
+          </div>
+          <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
+            <div className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${pct}%`, background: "linear-gradient(90deg, #c2852a, #e8c98a)" }} />
+          </div>
+        </div>
+
+        {/* Step pills */}
+        <div className="flex gap-1.5 px-6 pb-4 mt-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          {STEPS.map(s => {
+            const done = s.id < step, current = s.id === step;
+            return (
+              <button key={s.id} onClick={() => setStep(s.id)}
+                className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border transition-all cursor-pointer"
+                style={{
+                  background:  current ? ACCENT : done ? "rgba(194,133,42,0.15)" : "rgba(255,255,255,0.07)",
+                  color:       current ? "white" : done ? "#e8c98a"               : "rgba(255,255,255,0.45)",
+                  borderColor: current ? ACCENT  : done ? "rgba(194,133,42,0.3)"  : "rgba(255,255,255,0.1)",
+                }}>
+                <span className="text-[0.7rem]">{done ? "✓" : s.icon}</span>
+                <span className="hidden sm:inline">{s.label}</span>
+                <span className="sm:hidden">{s.id}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ══ CARD BODY ══ */}
+      <div className="overflow-y-auto flex-1">
+        <div className="px-6 py-5">
+          <div className="flex items-center gap-3 mb-5 pb-4 border-b border-[#f0ede9]">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+              style={{ background: "#fdf6ec", border: "1px solid #f0ddb8" }}>
+              {STEPS[step - 1].icon}
+            </div>
+            <div>
+              <h2 className="text-[1.05rem] font-bold text-[#1c1917]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                {STEPS[step - 1].label}
+              </h2>
+              <p className="text-[0.7rem] text-[#9a8c7a]">{stepInfo[step - 1]}</p>
+            </div>
+          </div>
+          {step === 1 && <Step1 d={data} set={set} />}
+          {step === 2 && <Step2 d={data} set={set} />}
+          {step === 3 && <Step3 d={data} set={set} />}
+          {step === 4 && <Step4 d={data} set={set} />}
+          {step === 5 && <Step5 d={data} set={set} />}
+          {step === 6 && <Step6 d={data} set={set} toggleChip={toggleChip} />}
+          {step === 7 && <Step7 d={data} set={set} />}
+          {step === 8 && <Step8 d={data} set={set} />}
+        </div>
+      </div>
+
+      {/* ══ CARD FOOTER ══ */}
+      <div className="px-6 py-4 flex items-center justify-between gap-3 flex-shrink-0"
+        style={{ borderTop: "1px solid #ece8e1", background: "#fdfcfa" }}>
+        <button onClick={prev} disabled={step === 1}
+          className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-[0.82rem] font-medium transition-all cursor-pointer border"
+          style={{ background: "white", color: "#4a3f35", borderColor: "#ece8e1", opacity: step === 1 ? 0.3 : 1 }}
+          onMouseEnter={e => { if (step > 1) e.currentTarget.style.borderColor = ACCENT; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ece8e1"; }}>
+          ← Back
+        </button>
+
+        <div className="flex items-center gap-1.5">
+          {STEPS.map(s => (
+            <div key={s.id} onClick={() => setStep(s.id)} className="rounded-full transition-all duration-300 cursor-pointer"
+              style={{ width: s.id === step ? 20 : 6, height: 6,
+                background: s.id === step ? ACCENT : s.id < step ? "#e8c98a" : "#ece8e1" }} />
+          ))}
+        </div>
+
+        {step < STEPS.length ? (
+          <button onClick={next}
+            className="px-6 py-2.5 rounded-xl text-white text-[0.82rem] font-semibold cursor-pointer border-none"
+            style={{ background: ACCENT, boxShadow: "0 2px 12px rgba(194,133,42,0.3)" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#a8701f"}
+            onMouseLeave={e => e.currentTarget.style.background = ACCENT}>
+            Next →
+          </button>
+        ) : (
+          <button onClick={save}
+            className="px-6 py-2.5 rounded-xl text-white text-[0.82rem] font-semibold cursor-pointer border-none"
+            style={{ background: "#4a7a4a", boxShadow: "0 2px 12px rgba(74,122,74,0.3)" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#3a6a3a"}
+            onMouseLeave={e => e.currentTarget.style.background = "#4a7a4a"}>
+            ✓ Save Profile
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  /* ── When used as modal overlay ── */
+  if (onClose) {
+    return (
+      <>
+        <style>{`body { overflow: hidden; }`}</style>
+        {/* Success toast */}
+        {toast && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-stone-950/70 backdrop-blur-sm">
+            <div className="w-full max-w-sm rounded-3xl flex flex-col items-center text-center px-8 py-10 bg-white border border-[#ece8e1] shadow-2xl"
+              style={{ animation: "popIn 0.35s cubic-bezier(0.34,1.56,0.64,1)" }}>
+              <style>{`
+                @keyframes popIn { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+                @keyframes drawCircle { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+                @keyframes drawTick   { from { stroke-dashoffset: 60;  } to { stroke-dashoffset: 0; } }
+              `}</style>
+
+              {/* Animated SVG circle + tick */}
+              <div className="mb-5">
+                <svg width="88" height="88" viewBox="0 0 96 96">
+                  <circle cx="48" cy="48" r="44" fill="#fdf6ec" stroke="#f0ddb8" strokeWidth="2" />
+                  <circle cx="48" cy="48" r="38" fill="none" stroke="#c2852a" strokeWidth="3.5"
+                    strokeLinecap="round" strokeDasharray="200" strokeDashoffset="0"
+                    style={{ animation: "drawCircle 0.6s ease forwards", transformOrigin: "center", transform: "rotate(-90deg)" }} />
+                  <polyline points="30,50 43,63 66,36" fill="none" stroke="#c2852a"
+                    strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
+                    strokeDasharray="60" strokeDashoffset="0"
+                    style={{ animation: "drawTick 0.4s 0.5s ease both" }} />
+                </svg>
+              </div>
+
+              {/* Badge */}
+              <span className="text-[0.62rem] font-bold tracking-widest uppercase text-[#c2852a] mb-2">
+                Matrimony Profile
+              </span>
+
+              {/* Heading */}
+              <h2 className="text-[1.6rem] font-bold text-[#1c1917] mb-1.5"
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Profile Completed!
+              </h2>
+
+              {/* Subtext */}
+              <p className="text-[#9a8c7a] text-[0.83rem] mb-5">
+                Your matrimony profile has been created successfully.
+              </p>
+
+              {/* Divider */}
+              <div className="w-10 h-px bg-[#f0ddb8] mb-5" />
+
+              {/* Stats row */}
+              <div className="flex items-center gap-5">
+                <div className="text-center">
+                  <p className="text-[1.2rem] font-bold text-[#1c1917]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>8×</p>
+                  <p className="text-[0.62rem] text-[#9a8c7a] uppercase tracking-wide mt-0.5">More Responses</p>
+                </div>
+                <div className="w-px h-8 bg-[#f0ddb8]" />
+                <div className="text-center">
+                  <p className="text-[1.2rem] font-bold text-[#1c1917]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>100%</p>
+                  <p className="text-[0.62rem] text-[#9a8c7a] uppercase tracking-wide mt-0.5">Complete</p>
+                </div>
+                <div className="w-px h-8 bg-[#f0ddb8]" />
+                <div className="text-center">
+                  <p className="text-[1.2rem] font-bold text-[#4a7a4a]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>✓</p>
+                  <p className="text-[0.62rem] text-[#9a8c7a] uppercase tracking-wide mt-0.5">Verified</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Overlay backdrop */}
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+          style={{ background: "rgba(28,25,23,0.65)", backdropFilter: "blur(4px)" }}
+          onKeyDown={handleKeyDown}
+        >
+          {/* Click outside to close */}
+          <div className="absolute inset-0" onClick={onClose} />
+          <div className="relative z-10 w-full max-w-2xl">
+            {card}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  /* ── When used as standalone page (fallback) ── */
+  return (
+    <div className="min-h-screen flex items-start justify-center py-10 pt-20 px-4 pb-16"
+      style={{ background: "#f9f7f4", fontFamily: "'Inter', sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+      {toast && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-3xl flex flex-col items-center text-center px-8 py-10 bg-white border border-[#ece8e1] shadow-2xl"
+            style={{ animation: "popIn 0.35s cubic-bezier(0.34,1.56,0.64,1)" }}>
+            <style>{`
+              @keyframes popIn    { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+              @keyframes drawCircle { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+              @keyframes drawTick   { from { stroke-dashoffset: 60;  } to { stroke-dashoffset: 0; } }
+            `}</style>
+            <div className="mb-5">
+              <svg width="88" height="88" viewBox="0 0 96 96">
+                <circle cx="48" cy="48" r="44" fill="#fdf6ec" stroke="#f0ddb8" strokeWidth="2" />
+                <circle cx="48" cy="48" r="38" fill="none" stroke="#c2852a" strokeWidth="3.5"
+                  strokeLinecap="round" strokeDasharray="200" strokeDashoffset="0"
+                  style={{ animation: "drawCircle 0.6s ease forwards", transformOrigin: "center", transform: "rotate(-90deg)" }} />
+                <polyline points="30,50 43,63 66,36" fill="none" stroke="#c2852a"
+                  strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
+                  strokeDasharray="60" strokeDashoffset="0"
+                  style={{ animation: "drawTick 0.4s 0.5s ease both" }} />
+              </svg>
+            </div>
+            <span className="text-[0.62rem] font-bold tracking-widest uppercase text-[#c2852a] mb-2">Matrimony Profile</span>
+            <h2 className="text-[1.6rem] font-bold text-[#1c1917] mb-1.5" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Profile Completed!
+            </h2>
+            <p className="text-[#9a8c7a] text-[0.83rem] mb-5">Your matrimony profile has been created successfully.</p>
+            <div className="w-10 h-px bg-[#f0ddb8] mb-5" />
+            <div className="flex items-center gap-5">
+              <div className="text-center">
+                <p className="text-[1.2rem] font-bold text-[#1c1917]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>8×</p>
+                <p className="text-[0.62rem] text-[#9a8c7a] uppercase tracking-wide mt-0.5">More Responses</p>
+              </div>
+              <div className="w-px h-8 bg-[#f0ddb8]" />
+              <div className="text-center">
+                <p className="text-[1.2rem] font-bold text-[#1c1917]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>100%</p>
+                <p className="text-[0.62rem] text-[#9a8c7a] uppercase tracking-wide mt-0.5">Complete</p>
+              </div>
+              <div className="w-px h-8 bg-[#f0ddb8]" />
+              <div className="text-center">
+                <p className="text-[1.2rem] font-bold text-[#4a7a4a]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>✓</p>
+                <p className="text-[0.62rem] text-[#9a8c7a] uppercase tracking-wide mt-0.5">Verified</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {card}
+    </div>
+  );
+}
