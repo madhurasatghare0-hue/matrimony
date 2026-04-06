@@ -51,7 +51,7 @@ function HomeCards() {
   const translateX = `calc(50% - ${activeIndex * CARD_TOTAL + CARD_WIDTH / 2}px)`;
 
   return (
-    <section className="bg-[#f5f0eb] py-24">
+    <section className="py-24">
       <div className="max-w-6xl mx-auto px-6">
 
         {/* Heading */}

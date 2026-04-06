@@ -61,7 +61,7 @@ export default function Shortlist() {
           </div>
         </div>
       ) : (
-        <div className="min-h-screen bg-[#f5f0eb] px-6 pt-10 pb-16 mt-12">
+        <div className="min-h-screen px-6 pt-10 pb-16 mt-12">
           <div className="max-w-[1200px] mx-auto">
 
             {/* Header */}

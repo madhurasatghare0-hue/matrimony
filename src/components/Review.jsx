@@ -32,7 +32,7 @@ function Review() {
   const translateX = `calc(50% - ${activeIndex * CARD_TOTAL + CARD_WIDTH / 2}px)`;
 
   return (
-    <section className="bg-[#f5f0eb] py-24 border-t border-amber-100">
+    <section className="py-24 border-t border-amber-100">
       <div className="max-w-6xl mx-auto px-6">
 
         <div className="text-center mb-16">
