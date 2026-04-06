@@ -7,6 +7,17 @@ function Login() {
   const redirectTo = location.state?.from || "/";
   const [userType, setUserType] = useState("free");
   const [focused, setFocused] = useState("");
+  const [formData, setFormData] = useState({
+      userName: "",
+      password: "",
+    });
+  
+    const handleChange = (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -91,7 +102,7 @@ function Login() {
           <div className="px-8 pt-7 pb-8 bg-[#f9f7f4]">
             <form onSubmit={handleSubmit}>
 
-              <div className="mb-[1.1rem]">
+              {/* <div className="mb-[1.1rem]">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
                   Full Name
                 </label>
@@ -129,6 +140,38 @@ function Login() {
                   placeholder="Enter mobile number"
                   className={inputClass("mobile")}
                   onFocus={() => setFocused("mobile")}
+                  onBlur={() => setFocused("")}
+                />
+              </div> */}
+
+               <div className="mb-4">
+                <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
+                  User Name
+                </label>
+                <input
+                  type="text"
+                  name="userName"                 
+                  value={formData.userName}
+                  onChange={handleChange}
+                  placeholder="Enter your User name"
+                  className={inputClass("name")}
+                  onFocus={() => setFocused("name")}
+                  onBlur={() => setFocused("")}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"                 
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className={inputClass("password")}
+                  onFocus={() => setFocused("password")}
                   onBlur={() => setFocused("")}
                 />
               </div>

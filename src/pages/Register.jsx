@@ -4,10 +4,26 @@ import { useNavigate } from "react-router-dom";
 function Register() {
   const navigate = useNavigate();
   const [focused, setFocused] = useState("");
-  const [preference, setPreference] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    userName: "",
+    mobileNumber: "",
+    email: "",
+    password: "",
+    lookingFor: ""
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(formData); // your backend payload is ready here
     navigate("/");
   };
 
@@ -20,9 +36,6 @@ function Register() {
 
   return (
     <>
-      
-
-      {/* Fixed background — fills entire viewport including behind navbar */}
       <div
         className="fixed inset-0 bg-cover bg-center"
         style={{
@@ -30,7 +43,6 @@ function Register() {
             "url('https://imgs.search.brave.com/vLSQbXzsQDHKlZrbNiK9Br-QT69MoTtDh6yk8gMOJC0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bGluYW5kamlyc2Eu/Y29tL3dwLWNvbnRl/bnQvdXBsb2Fkcy8w/MDA3LU1OLVBlbGlj/YW4tSGlsbC1TYW5n/ZWV0LVdlZGRpbmct/UGhvdG9zLmpwZw')",
         }}
       >
-        {/* Overlay */}
         <div
           className="absolute inset-0"
           style={{
@@ -40,12 +52,9 @@ function Register() {
         />
       </div>
 
-      {/* Scrollable content layer */}
       <div className="mt-20 relative z-10 min-h-screen flex items-center justify-center p-6">
-        {/* Card */}
         <div className="w-full max-w-[440px] bg-white rounded-[20px] border border-[#ede8e1] shadow-[0_24px_64px_rgba(0,0,0,0.18)] overflow-hidden">
 
-          {/* Card header */}
           <div className="bg-[#daccb8] px-8 pt-7 pb-6 text-center">
             <div className="inline-block text-[0.65rem] font-bold tracking-[0.12em] uppercase text-[#c2852a] bg-[rgba(194,133,42,0.15)] border border-[rgba(232,201,138,0.3)] px-3 py-[3px] rounded-full mb-3">
               Trusted Matrimony Platform
@@ -60,35 +69,18 @@ function Register() {
             <p className="text-[0.75rem] text-black/[0.48] m-0">
               Join thousands finding their perfect match
             </p>
-
-            {/* Ornament */}
             <div className="flex items-center justify-center gap-2.5 mt-4">
-              <div
-                className="h-px w-11"
-                style={{
-                  background:
-                    "linear-gradient(to right, transparent, rgba(232,201,138,0.45))",
-                }}
-              />
+              <div className="h-px w-11" style={{ background: "linear-gradient(to right, transparent, rgba(232,201,138,0.45))" }} />
               <div className="w-[5px] h-[5px] bg-[#c2852a] rotate-45 rounded-[1px]" />
-              <div
-                className="h-px w-11"
-                style={{
-                  background:
-                    "linear-gradient(to left, transparent, rgba(232,201,138,0.45))",
-                }}
-              />
+              <div className="h-px w-11" style={{ background: "linear-gradient(to left, transparent, rgba(232,201,138,0.45))" }} />
             </div>
           </div>
 
-          {/* Divider */}
           <div className="h-px bg-[#ede8e1]" />
 
-          {/* Form body */}
           <div className="px-8 pt-6 pb-8 bg-[#f9f7f4]">
             <form onSubmit={handleSubmit}>
 
-              {/* Name row */}
               <div className="grid grid-cols-2 gap-2.5 mb-4">
                 <div>
                   <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
@@ -96,6 +88,9 @@ function Register() {
                   </label>
                   <input
                     type="text"
+                    name="firstName"              
+                    value={formData.firstName}
+                    onChange={handleChange}
                     placeholder="First name"
                     className={inputClass("first")}
                     onFocus={() => setFocused("first")}
@@ -108,6 +103,9 @@ function Register() {
                   </label>
                   <input
                     type="text"
+                    name="lastName"               
+                    value={formData.lastName}
+                    onChange={handleChange}
                     placeholder="Last name"
                     className={inputClass("last")}
                     onFocus={() => setFocused("last")}
@@ -118,13 +116,48 @@ function Register() {
 
               <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
+                  User Name
+                </label>
+                <input
+                  type="text"
+                  name="userName"                 
+                  value={formData.userName}
+                  onChange={handleChange}
+                  placeholder="Enter your User name"
+                  className={inputClass("name")}
+                  onFocus={() => setFocused("name")}
+                  onBlur={() => setFocused("")}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
                   Email Address
                 </label>
                 <input
                   type="email"
+                  name="email"                    
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="Enter your email"
                   className={inputClass("email")}
                   onFocus={() => setFocused("email")}
+                  onBlur={() => setFocused("")}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"                 
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className={inputClass("password")}
+                  onFocus={() => setFocused("password")}
                   onBlur={() => setFocused("")}
                 />
               </div>
@@ -135,6 +168,9 @@ function Register() {
                 </label>
                 <input
                   type="text"
+                  name="mobileNumber"             
+                  value={formData.mobileNumber}
+                  onChange={handleChange}
                   placeholder="Enter mobile number"
                   className={inputClass("mobile")}
                   onFocus={() => setFocused("mobile")}
@@ -142,7 +178,6 @@ function Register() {
                 />
               </div>
 
-              {/* Looking For */}
               <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
                   Looking For
@@ -152,9 +187,9 @@ function Register() {
                     <button
                       key={opt}
                       type="button"
-                      onClick={() => setPreference(opt)}
+                      onClick={() => setFormData({ ...formData, lookingFor: opt })}  // ✅ backend key
                       className={`flex-1 py-2.5 rounded-xl border-[1.5px] text-[0.8rem] font-semibold cursor-pointer text-center transition-all duration-150 ${
-                        preference === opt
+                        formData.lookingFor === opt
                           ? "border-[#c2852a] bg-[#fdf3e3] text-[#c2852a]"
                           : "border-[#e5e0d8] bg-white text-gray-400"
                       }`}
