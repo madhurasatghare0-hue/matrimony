@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [focused, setFocused] = useState("");
   const [formData, setFormData] = useState({
@@ -57,18 +59,19 @@ function Register() {
 
           <div className="bg-[#daccb8] px-8 pt-7 pb-6 text-center">
             <div className="inline-block text-[0.65rem] font-bold tracking-[0.12em] uppercase text-[#c2852a] bg-[rgba(194,133,42,0.15)] border border-[rgba(232,201,138,0.3)] px-3 py-[3px] rounded-full mb-3">
-              Trusted Matrimony Platform
+              {t("register.tag")}
             </div>
             <h2
               className="text-[1.9rem] font-bold text-black tracking-tight leading-tight m-0 mb-1"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
-              Create{" "}
-              <span className="text-[#c2852a] italic">Account</span>
+              {t("register.title")} 
+              <span className="text-[#c2852a] italic">
+                {t("register.titleHighlight")}
+              </span>
             </h2>
             <p className="text-[0.75rem] text-black/[0.48] m-0">
-              Join thousands finding their perfect match
-            </p>
+             {t("register.subtitle")}</p>
             <div className="flex items-center justify-center gap-2.5 mt-4">
               <div className="h-px w-11" style={{ background: "linear-gradient(to right, transparent, rgba(232,201,138,0.45))" }} />
               <div className="w-[5px] h-[5px] bg-[#c2852a] rotate-45 rounded-[1px]" />
@@ -84,14 +87,14 @@ function Register() {
               <div className="grid grid-cols-2 gap-2.5 mb-4">
                 <div>
                   <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                    First Name
+                    {t("register.firstNameLabel")}
                   </label>
                   <input
                     type="text"
                     name="firstName"              
                     value={formData.firstName}
                     onChange={handleChange}
-                    placeholder="First name"
+                    placeholder={t("register.firstNamePlaceholder")}
                     className={inputClass("first")}
                     onFocus={() => setFocused("first")}
                     onBlur={() => setFocused("")}
@@ -99,14 +102,14 @@ function Register() {
                 </div>
                 <div>
                   <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                    Last Name
+                    {t("register.lastNameLabel")}
                   </label>
                   <input
                     type="text"
                     name="lastName"               
                     value={formData.lastName}
                     onChange={handleChange}
-                    placeholder="Last name"
+                    placeholder={t("register.lastNamePlaceholder")}
                     className={inputClass("last")}
                     onFocus={() => setFocused("last")}
                     onBlur={() => setFocused("")}
@@ -116,14 +119,14 @@ function Register() {
 
               <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                  User Name
+                  {t("register.usernameLabel")}
                 </label>
                 <input
                   type="text"
                   name="userName"                 
                   value={formData.userName}
                   onChange={handleChange}
-                  placeholder="Enter your User name"
+                  placeholder={t("register.usernamePlaceholder")}
                   className={inputClass("name")}
                   onFocus={() => setFocused("name")}
                   onBlur={() => setFocused("")}
@@ -132,14 +135,14 @@ function Register() {
 
               <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                  Email Address
+                  {t("register.emailLabel")}
                 </label>
                 <input
                   type="email"
                   name="email"                    
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter your email"
+                  placeholder={t("register.emailPlaceholder")}
                   className={inputClass("email")}
                   onFocus={() => setFocused("email")}
                   onBlur={() => setFocused("")}
@@ -148,14 +151,14 @@ function Register() {
 
               <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                  Password
+                  {t("register.passwordLabel")}
                 </label>
                 <input
                   type="password"
                   name="password"                 
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Enter your password"
+                  placeholder={t("register.passwordPlaceholder")}
                   className={inputClass("password")}
                   onFocus={() => setFocused("password")}
                   onBlur={() => setFocused("")}
@@ -164,14 +167,14 @@ function Register() {
 
               <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                  Mobile Number
+                  {t("register.mobileLabel")}
                 </label>
                 <input
                   type="text"
                   name="mobileNumber"             
                   value={formData.mobileNumber}
                   onChange={handleChange}
-                  placeholder="Enter mobile number"
+                  placeholder={t("register.mobilePlaceholder")}
                   className={inputClass("mobile")}
                   onFocus={() => setFocused("mobile")}
                   onBlur={() => setFocused("")}
@@ -179,41 +182,46 @@ function Register() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                  Looking For
-                </label>
-                <div className="flex gap-2 mt-0.5">
-                  {["Bride", "Groom"].map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, lookingFor: opt })}  // ✅ backend key
-                      className={`flex-1 py-2.5 rounded-xl border-[1.5px] text-[0.8rem] font-semibold cursor-pointer text-center transition-all duration-150 ${
-                        formData.lookingFor === opt
-                          ? "border-[#c2852a] bg-[#fdf3e3] text-[#c2852a]"
-                          : "border-[#e5e0d8] bg-white text-gray-400"
-                      }`}
-                    >
-                      {opt === "Bride" ? "♀ Bride" : "♂ Groom"}
-                    </button>
-                  ))}
-                </div>
+  <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
+    {t("register.lookingForLabel")}
+  </label>
+
+              <div className="flex gap-2 mt-0.5">
+                {["Bride", "Groom"].map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, lookingFor: opt }) // ✅ backend stays ENGLISH
+                    }
+                    className={`flex-1 py-2.5 rounded-xl border-[1.5px] text-[0.8rem] font-semibold cursor-pointer text-center transition-all duration-150 ${
+                      formData.lookingFor === opt
+                        ? "border-[#c2852a] bg-[#fdf3e3] text-[#c2852a]"
+                        : "border-[#e5e0d8] bg-white text-gray-400"
+                    }`}
+                  >
+                    {opt === "Bride"
+                      ? t("register.bride")
+                      : t("register.groom")}
+                  </button>
+                ))}
               </div>
+            </div>
 
               <button
                 type="submit"
                 className="w-full py-3 mt-1.5 rounded-xl border-none bg-[#1c1917] text-white text-[0.85rem] font-semibold tracking-wide cursor-pointer hover:opacity-80 hover:-translate-y-px transition-all duration-150"
               >
-                Create Account →
+                {t("register.submitBtn")} →
               </button>
 
               <p className="text-center mt-4 text-[0.8rem] text-gray-400">
-                Already registered?
+                {t("register.alreadyRegistered")}
                 <span
                   className="text-[#c2852a] font-semibold cursor-pointer ml-1 hover:opacity-70 transition-opacity"
                   onClick={() => navigate("/login")}
                 >
-                  Login
+                  {t("register.loginLink")}
                 </span>
               </p>
 

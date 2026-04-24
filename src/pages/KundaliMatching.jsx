@@ -1,23 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const ACCENT = "#c2852a";
 const DARK = "#1c1917";
 const BORDER = "#ece8e1";
 const MUTED = "#9a8c7a";
 
-const RASHIS = [
-  "Mesh (Aries)", "Vrishabh (Taurus)", "Mithun (Gemini)", "Kark (Cancer)",
-  "Simha (Leo)", "Kanya (Virgo)", "Tula (Libra)", "Vrishchik (Scorpio)",
-  "Dhanu (Sagittarius)", "Makar (Capricorn)", "Kumbh (Aquarius)", "Meen (Pisces)",
-];
 
-const NAKSHATRAS = [
-  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
-  "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
-  "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
-  "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishtha",
-  "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
-];
 
 const GUNAS = [
   { name: "Varna", max: 1 },
@@ -122,6 +111,11 @@ function Field({ label, children }) {
 
 function PersonCard({ who, accent, data, onChange }) {
   const set = (k) => (e) => onChange({ ...data, [k]: e.target.value });
+  const { t } = useTranslation();
+
+  const rashiOptions = t("cp.options.rashi", { returnObjects: true }) || [];
+  const nakshatraOptions = t("cp.options.nakshatra", { returnObjects: true }) || [];
+  const manglikOptions = t("cp.options.manglik", { returnObjects: true }) || [];
 
   return (
     <div
@@ -139,64 +133,66 @@ function PersonCard({ who, accent, data, onChange }) {
           color: accent,
         }}
       >
-        {who === "Bride" ? "🌸" : "🔷"} {who}'s Details
+        
+      {who === "Bride"
+        ? "🌸 " + t("kundali.brideDetails")
+        : "🔷 " + t("kundali.groomDetails")}
+
       </h3>
 
-      <Field label="Full Name">
+       <Field label={t("kundali.fullName")}>
         <StyledInput
-          placeholder={`${who}'s full name`}
+          placeholder={t("kundali.fullNamePh", {
+          who: t(`kundali.${who.toLowerCase()}`)
+         })}
           value={data.name}
           onChange={set("name")}
         />
       </Field>
 
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Date of Birth">
+        <Field label={t("kundali.dob")}>
           <StyledInput type="date" value={data.dob} onChange={set("dob")} />
         </Field>
 
-        <Field label="Time of Birth">
+        <Field label={t("kundali.tob")}>
           <StyledInput type="time" value={data.tob} onChange={set("tob")} />
         </Field>
       </div>
 
-      <Field label="City of Birth">
+      <Field label={t("kundali.city")}>
         <StyledInput
-          placeholder="Mumbai, Pune..."
+          placeholder={t("kundali.birthCityPh")}
           value={data.city}
           onChange={set("city")}
         />
       </Field>
 
-      <Field label="Rashi">
+      <Field label={t("kundali.rashi")}>
         <StyledSelect
           value={data.rashi}
           onChange={set("rashi")}
-          options={RASHIS}
-          placeholder="Select Rashi"
+          options={rashiOptions}
+          placeholder={t("kundali.rashiPh")}
         />
       </Field>
 
-      <Field label="Nakshatra">
+      <Field label={t("kundali.nakshatra")}>
         <StyledSelect
           value={data.nakshatra}
           onChange={set("nakshatra")}
-          options={NAKSHATRAS}
-          placeholder="Select Nakshatra"
+          options={nakshatraOptions} 
+          placeholder={t("kundali.nakshatraPh")}
+
         />
       </Field>
 
-      <Field label="Manglik Status">
+      <Field label={t("kundali.manglik")}>
         <StyledSelect
           value={data.manglik}
           onChange={set("manglik")}
-          options={[
-            "Manglik",
-            "Non-Manglik",
-            "Partial Manglik",
-            "Don't Know",
-          ]}
-          placeholder="Select"
+          options={manglikOptions}
+          placeholder={t("kundali.manglikPh")}
         />
       </Field>
     </div>
@@ -209,6 +205,7 @@ export default function KundaliMatching() {
   const [bride, setBride] = useState({ ...empty });
   const [groom, setGroom] = useState({ ...empty });
   const [result, setResult] = useState(null);
+  const { t } = useTranslation();
 
   const calculate = () => {
     if (!bride.name || !groom.name) {
@@ -230,12 +227,26 @@ export default function KundaliMatching() {
     }, 200);
   };
 
-  const verdict =
-    result?.total >= 28
-      ? { label: "Excellent Match", color: "#5a8a5a" }
-      : result?.total >= 18
-      ? { label: "Good Match", color: ACCENT }
-      : { label: "Needs Consideration", color: "#b05555" };
+   let verdict = {};
+
+if (result) {
+  if (result.total >= 28) {
+    verdict = {
+      label: t("kundali.excellent"),
+      color: "#2e7d32"
+    };
+  } else if (result.total >= 18) {
+    verdict = {
+      label: t("kundali.good"),
+      color: "#c2852a"
+    };
+  } else {
+    verdict = {
+      label: t("kundali.consider"),
+      color: "#c62828"
+    };
+  }
+}
 
   return (
     <div
@@ -251,12 +262,11 @@ export default function KundaliMatching() {
             color: DARK,
           }}
         >
-          Kundali Matching
+          {t("kundali.title")}
         </h1>
 
         <p className="text-sm max-w-xl mx-auto" style={{ color: MUTED }}>
-          Check horoscope compatibility between bride and groom using the
-          traditional Ashta-Koota system.
+          {t("kundali.subtitle")}
         </p>
 
         <div
@@ -284,7 +294,7 @@ export default function KundaliMatching() {
               boxShadow: "0 4px 18px rgba(194,133,42,0.35)",
             }}
           >
-            ♥ Calculate Match
+            ♥  {t("kundali.calculate")}
           </button>
         </div>
 
@@ -324,7 +334,7 @@ export default function KundaliMatching() {
                 </h3>
 
                 <p className="text-[11px] uppercase tracking-widest mb-8" style={{ color: MUTED }}>
-                  Ashta-Koota Milan
+                 {t("kundali.matchType")}
                 </p>
 
                 {/* Thin gold divider */}
@@ -345,7 +355,7 @@ export default function KundaliMatching() {
                 </div>
 
                 <p className="text-sm mt-1 mb-6" style={{ color: MUTED, letterSpacing: "0.04em" }}>
-                  out of 36
+                  {t("kundali.outOf")}
                 </p>
 
                 {/* Progress bar */}
@@ -378,8 +388,7 @@ export default function KundaliMatching() {
                 {/* Bottom hint */}
                 {result.total < 18 && (
                   <p className="mt-5 text-[11px]" style={{ color: "#b8ad9e" }}>
-                    Score below 18 · Consult a Jyotishi for guidance
-                  </p>
+                   {t("kundali.consultHint")}                  </p>
                 )}
               </div>
             </div>

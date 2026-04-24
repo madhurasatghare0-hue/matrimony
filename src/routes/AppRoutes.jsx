@@ -11,7 +11,7 @@ import Matches from "../pages/Matches";
 import ViewProfile from "../pages/ViewProfile";
 import Shortlist from "../pages/Shortlist";
 import Interests from "../pages/Interests";
-import Messages from "../pages/Messages";
+// import Messages from "../pages/Messages";
 import KundaliMatching from "../pages/KundaliMatching";
 import CompleteProfile from "../pages/CompleteProfile";
 
@@ -32,9 +32,9 @@ export default function AppRoutes() {
         <Route path="/shortlist" element={<Shortlist />} />
         <Route path="/interests" element={<Interests />} />
 
-        {/* Unified split-panel chat — all chat routes go to MessagesPage */}
-        <Route path="/chats" element={<Messages />} />
-        <Route path="/chats/:id" element={<Messages />} />
+        
+        {/* <Route path="/chats" element={<Messages />} />
+        <Route path="/chats/:id" element={<Messages />} /> */}
 
         <Route path="/kundali" element={<KundaliMatching />} />
         <Route path="/complete-profile" element={<CompleteProfile />} />

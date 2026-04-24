@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer style={{ background: "#1c1917" }} className="text-gray-300 mt-20">
 
@@ -12,98 +15,55 @@ export default function Footer() {
             className="text-white font-semibold text-xl mb-3"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            Wedding Matrimony
+            {t("footer.brand")}
           </h3>
           <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
-            Find your perfect life partner with trust, privacy, and the blessings of tradition.
+            {t("footer.tagline")}
           </p>
-          {/* Gold divider */}
           <div className="mt-4 w-10 h-[2px]" style={{ background: "#c2852a" }} />
         </div>
 
         {/* Quick Links */}
         <div>
           <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">
-            Quick Links
+            {t("footer.quickLinks")}
           </h4>
           <ul className="space-y-2 text-sm">
-            <li>
-              <Link to="/" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to="/matches" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Browse Matches
-              </Link>
-            </li>
-            <li>
-              <Link to="/shortlist" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Shortlist
-              </Link>
-            </li>
-            <li>
-              <Link to="/interests" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Interests
-              </Link>
-            </li>
-            <li>
-              <Link to="/kundali" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Kundali Matching
-              </Link>
-            </li>
-            <li>
-              <Link to="/profile" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                My Profile
-              </Link>
-            </li>
+            <li><Link to="/" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.home")}</Link></li>
+            <li><Link to="/matches" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.browseMatches")}</Link></li>
+            <li><Link to="/shortlist" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.shortlist")}</Link></li>
+            <li><Link to="/interests" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.interests")}</Link></li>
+            <li><Link to="/kundali" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.kundali")}</Link></li>
+            <li><Link to="/profile" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.myProfile")}</Link></li>
           </ul>
         </div>
 
         {/* Company */}
         <div>
           <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">
-            Company
+            {t("footer.company")}
           </h4>
           <ul className="space-y-2 text-sm">
-            <li>
-              <Link to="/login" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Login
-              </Link>
-            </li>
-             <li>
-              <Link to="/register" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Register 
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                About Us
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" className="text-gray-400 hover:text-[#c2852a] transition-colors">
-                Contact
-              </Link>
-            </li>
-            
+            <li><Link to="/login" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.login")}</Link></li>
+            <li><Link to="/register" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.register")}</Link></li>
+            <li><Link to="/about" className="text-gray-400 hover:text-[#c2852a] transition-colors">{t("footer.links.about")}</Link></li>
           </ul>
         </div>
 
         {/* Follow */}
         <div>
           <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">
-            Follow Us
+            {t("footer.followUs")}
           </h4>
           <div className="flex flex-col gap-3 text-sm">
             <a href="#" className="flex items-center gap-2 text-gray-400 hover:text-[#c2852a] transition-colors">
-              <span>🌐</span> Website
+              <span>🌐</span> {t("footer.links.website")}
             </a>
             <a href="#" className="flex items-center gap-2 text-gray-400 hover:text-[#c2852a] transition-colors">
-              <span>📘</span> Facebook
+              <span>📘</span> {t("footer.links.facebook")}
             </a>
             <a href="#" className="flex items-center gap-2 text-gray-400 hover:text-[#c2852a] transition-colors">
-              <span>📸</span> Instagram
+              <span>📸</span> {t("footer.links.instagram")}
             </a>
           </div>
         </div>
@@ -115,7 +75,8 @@ export default function Footer() {
         className="border-t text-center py-4 text-sm"
         style={{ borderColor: "#2d2926", color: "#6b6560" }}
       >
-        © 2026 Wedding Matrimony
+        <div>{t("footer.copyright")}</div>
+        <div className="mt-1">{t("footer.Developed_by")}</div>
       </div>
 
     </footer>

@@ -6,6 +6,8 @@ import KundaliSection from "../components/KundaliSection";
 import FaqSection from "../components/FaqSection";
 import ProfileBanner from "../components/ProfileBanner";
 import CompleteProfile from "./CompleteProfile";
+import { useTranslation } from "react-i18next";
+
 
 const HERO_IMAGES = [
   "https://imgs.search.brave.com/vLSQbXzsQDHKlZrbNiK9Br-QT69MoTtDh6yk8gMOJC0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bGluYW5kamlyc2Eu/Y29tL3dwLWNvbnRl/bnQvdXBsb2Fkcy8w/MDA3LU1OLVBlbGlj/YW4tSGlsbC1TYW5n/ZWV0LVdlZGRpbmct/UGhvdG9zLmpwZw",
@@ -15,6 +17,7 @@ const HERO_IMAGES = [
 ];
 
 export default function Home() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex]       = useState(1);
@@ -80,24 +83,23 @@ export default function Home() {
           <div className="max-w-[560px]">
             <p className="text-[0.72rem] font-bold tracking-[0.12em] uppercase text-amber-300 mb-2"
               style={{ fontFamily: "'Inter', sans-serif" }}>
-              Trusted Matrimony Platform
+              {t("home.tagline")}
             </p>
             <h1 className="text-[clamp(2.6rem,5vw,3.8rem)] font-bold text-white leading-[1.1] tracking-tight mb-5"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              Perfect Weddings
+              {t("home.title1")}
               <br />
-              <span className="font-medium text-amber-200">Happen Here.</span>
+              <span className="font-medium text-amber-200">{t("home.title2")}</span>
             </h1>
             <p className="text-white/75 text-base leading-relaxed max-w-[420px]"
               style={{ fontFamily: "'Inter', sans-serif" }}>
-              Find your life partner with a trusted and modern matrimony
-              experience — curated, meaningful, and made for you.
+              {t("home.description")}
             </p>
             <button
               onClick={() => navigate("/matches")}
               className="mt-6 inline-block px-8 py-3 bg-[#c2852a] text-white text-sm font-semibold tracking-wide rounded-xl border-none cursor-pointer transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
               style={{ fontFamily: "'Inter', sans-serif" }}>
-              Find Your Match →
+              {t("home.cta")}
             </button>
           </div>
         </div>
@@ -121,3 +123,8 @@ export default function Home() {
     </>
   );
 }
+
+
+
+
+

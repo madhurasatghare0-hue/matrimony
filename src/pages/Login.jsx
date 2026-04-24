@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from || "/";
@@ -63,16 +65,17 @@ function Login() {
           {/* Card header */}
           <div className="bg-[#daccb8] px-8 pt-8 pb-7 text-center">
             <div className="inline-block text-[0.65rem] font-bold tracking-[0.12em] uppercase text-[#c2852a] bg-[rgba(194,133,42,0.15)] border border-[rgba(232,201,138,0.3)] px-3 py-[3px] rounded-full mb-3">
-              Trusted Matrimony Platform
+              {t("login.tag")}
             </div>
             <h2
               className="text-[2rem] font-bold text-black tracking-tight leading-tight m-0 mb-1"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
-              Welcome <span className="text-[#c2852a] italic">Back</span>
-            </h2>
+              {t("login.title")} 
+              <span className="text-[#c2852a] italic"> {t("login.titleHighlight")}</span>            
+              </h2>
             <p className="text-[0.78rem] text-black/50 m-0">
-              Login to find your perfect match
+              {t("login.subtitle")}
             </p>
 
             {/* Ornament */}
@@ -146,14 +149,14 @@ function Login() {
 
                <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                  User Name
+                  {t("login.usernameLabel")}
                 </label>
                 <input
                   type="text"
                   name="userName"                 
                   value={formData.userName}
                   onChange={handleChange}
-                  placeholder="Enter your User name"
+                  placeholder={t("login.usernamePlaceholder")}
                   className={inputClass("name")}
                   onFocus={() => setFocused("name")}
                   onBlur={() => setFocused("")}
@@ -162,14 +165,14 @@ function Login() {
 
               <div className="mb-4">
                 <label className="block text-[0.7rem] font-bold tracking-[0.07em] uppercase text-gray-500 mb-1.5">
-                  Password
+                  {t("login.passwordLabel")}
                 </label>
                 <input
                   type="password"
                   name="password"                 
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Enter your password"
+                  placeholder={t("login.passwordPlaceholder")}
                   className={inputClass("password")}
                   onFocus={() => setFocused("password")}
                   onBlur={() => setFocused("")}
@@ -180,16 +183,16 @@ function Login() {
                 type="submit"
                 className="w-full py-3 mt-2 rounded-xl border-none bg-[#1c1917] text-white text-[0.85rem] font-semibold tracking-wide cursor-pointer hover:opacity-80 hover:-translate-y-px transition-all duration-150"
               >
-                Login →
+                {t("login.submitBtn")} →
               </button>
 
               <p className="text-center mt-4 text-[0.8rem] text-gray-400">
-                Don't have an account?
+                {t("login.noAccount")}
                 <span
                   className="text-[#c2852a] font-semibold cursor-pointer ml-1 hover:opacity-75 transition-opacity"
                   onClick={() => navigate("/register")}
                 >
-                  Register
+                  {t("login.registerLink")}
                 </span>
               </p>
 

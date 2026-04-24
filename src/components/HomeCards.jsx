@@ -1,43 +1,13 @@
 import React, { useEffect, useState } from "react";
-
-const cards = [
-  {
-    number: "01",
-    title: "Create Your Profile",
-    text: "Tell us about yourself — your background, values, and what you're looking for in a partner.",
-  },
-  {
-    number: "02",
-    title: "Discover Matches",
-    text: "Browse curated profiles filtered by location, religion, profession, and more.",
-  },
-  {
-    number: "03",
-    title: "Connect & Meet",
-    text: "Send a connect request and start a meaningful conversation with your match.",
-  },
-  {
-    number: "04",
-    title: "Get Verified",
-    text: "Complete a quick identity check to build trust and show matches you're genuinely who you say you are.",
-  },
-  {
-    number: "05",
-    title: "Share Your Expectations",
-    text: "Set your preferences for family values, lifestyle, and future goals so we can find truly compatible matches.",
-  },
-  {
-    number: "06",
-    title: "Begin Your Journey",
-    text: "Take the first step toward a lifelong bond — your perfect match could be just one conversation away.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const CARD_WIDTH = 300;
 const CARD_GAP = 24;
 const CARD_TOTAL = CARD_WIDTH + CARD_GAP;
 
 function HomeCards() {
+  const { t } = useTranslation();
+  const cards = t("homeCards.cards", { returnObjects: true });
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -45,9 +15,8 @@ function HomeCards() {
       setActiveIndex((prev) => (prev + 1) % cards.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [cards.length]);
 
-  // Offset so active card is always centered
   const translateX = `calc(50% - ${activeIndex * CARD_TOTAL + CARD_WIDTH / 2}px)`;
 
   return (
@@ -57,13 +26,13 @@ function HomeCards() {
         {/* Heading */}
         <div className="text-center mb-16">
           <p className="text-xs uppercase tracking-widest text-amber-600 font-semibold mb-3">
-            Simple &amp; Secure
+            {t("homeCards.sectionTag")}
           </p>
           <h2 className="text-4xl md:text-5xl font-serif text-gray-900">
-            How It Works
+            {t("homeCards.sectionTitle")}
           </h2>
           <p className="text-gray-500 mt-4 text-base max-w-md mx-auto">
-            Six easy steps to find the person you've been waiting for.
+            {t("homeCards.sectionDesc")}
           </p>
         </div>
 
@@ -95,8 +64,7 @@ function HomeCards() {
                       ? "scale(1.02) translateY(-4px)"
                       : "scale(0.92) translateY(0px)",
                     opacity: isActive ? 1 : isAdjacent ? 0.72 : 0.45,
-                    transition:
-                      "transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease, box-shadow 0.4s ease",
+                    transition: "transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease, box-shadow 0.4s ease",
                     boxShadow: isActive
                       ? "0 28px 52px rgba(0,0,0,0.15)"
                       : isAdjacent
@@ -127,24 +95,11 @@ function HomeCards() {
                     {card.number}
                   </div>
 
-                  <h3
-                    style={{
-                      fontSize: "20px",
-                      fontFamily: "serif",
-                      color: "#111827",
-                      marginBottom: "12px",
-                    }}
-                  >
+                  <h3 style={{ fontSize: "20px", fontFamily: "serif", color: "#111827", marginBottom: "12px" }}>
                     {card.title}
                   </h3>
 
-                  <p
-                    style={{
-                      color: "#6b7280",
-                      fontSize: "14px",
-                      lineHeight: "1.6",
-                    }}
-                  >
+                  <p style={{ color: "#6b7280", fontSize: "14px", lineHeight: "1.6" }}>
                     {card.text}
                   </p>
                 </div>

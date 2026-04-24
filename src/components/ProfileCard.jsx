@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { MapPin, Briefcase, Eye } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileCard({ profile }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
-    <article 
+    <article
       className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 hover:border-indigo-100 transition-all duration-300 hover:-translate-y-1 group"
       aria-label={`Profile of ${profile.name}`}
     >
@@ -19,7 +21,6 @@ export default function ProfileCard({ profile }) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
-            {/* Gradient overlay on hover */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </>
         ) : (
@@ -35,7 +36,7 @@ export default function ProfileCard({ profile }) {
 
       {/* Content */}
       <div className="p-5 space-y-4">
-        
+
         {/* Name + Age */}
         <div>
           <h3 className="text-xl font-bold text-gray-900 tracking-tight">
@@ -52,7 +53,6 @@ export default function ProfileCard({ profile }) {
               <span className="truncate">{profile.profession}</span>
             </p>
           )}
-          
           {profile.city && (
             <p className="flex items-center gap-2 text-sm text-gray-500">
               <MapPin size={16} className="text-gray-400 flex-shrink-0" strokeWidth={2} />
@@ -68,10 +68,9 @@ export default function ProfileCard({ profile }) {
           aria-label={`View ${profile.name}'s full profile`}
         >
           <Eye size={18} strokeWidth={2.5} />
-          <span>View Profile</span>
+          <span>{t("profileCard.viewProfile")}</span>
         </button>
       </div>
     </article>
   );
 }
-
