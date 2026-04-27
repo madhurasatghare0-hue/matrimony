@@ -104,8 +104,9 @@ export default function Profile() {
               {/* Edit button — opens modal */}
               <button
                 onClick={() => setShowEdit(true)}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-[#fdf3e3] border-[1.5px] border-[#e8c98a] text-[#c2852a] rounded-xl text-[0.8rem] font-semibold cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap self-start">
-                {/* <Edit2 size={13} /> <CardTitle>{t("profile.editBtn")}</CardTitle> */}
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-[#fdf3e3] border-[1.5px] border-[#e8c98a] text-[#c2852a] rounded-xl text-[0.8rem] font-semibold cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap self-start"
+              >
+                {t("profile.editBtn")}
               </button>
             </div>
 

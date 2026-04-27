@@ -23,6 +23,7 @@ export default function Home() {
   const [nextIndex, setNextIndex]       = useState(1);
   const [fading, setFading]             = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  
 
   useEffect(() => {
     const interval = setInterval(() => {

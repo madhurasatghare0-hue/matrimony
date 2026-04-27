@@ -12,7 +12,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
-const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { shortlist } = useShortlist();
   const { interests } = useInterest();
@@ -164,6 +164,10 @@ const { t, i18n } = useTranslation();
 
             <NavLink to="/shortlist" onClick={() => setOpen(false)} className="hover:text-yellow-600 transition">
               {t("navbar.shortlist")}
+            </NavLink>
+
+            <NavLink to="/interests" onClick={() => setOpen(false)} className="hover:text-yellow-600 transition">
+              {t("navbar.interest")}
             </NavLink>
 
             <button

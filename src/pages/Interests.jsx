@@ -27,7 +27,7 @@ export default function Interests() {
 
   if (interests.length === 0) {
     return (
-      <div className="min-h-screen bg-[#f5f0eb] flex items-center justify-center mt-12">
+      <div className="min-h-screen  flex items-center justify-center mt-12">
         <div className="text-center p-12 bg-white border border-[#ede8e1] rounded-2xl shadow max-w-[340px]">
           <div className="w-14 h-14 rounded-[14px] bg-[#fdf3e3] border border-[#e8c98a] flex items-center justify-center mx-auto mb-5">
             <Heart size={22} className="text-[#c2852a]" />

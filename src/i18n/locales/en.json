@@ -2,11 +2,12 @@
   "navbar": {
     "name" :"Wedding Matrimony",
     "home": "Home",
-    "about": "About",
+    "about": "About us",
     "matches": "Matches",
     "login": "Login",
     "signup": "Sign up",
     "shortlist": "Shortlist",
+    "interest":"Interest",
     "profile": "Profile"
   },
   "home": {
@@ -128,10 +129,6 @@
       {
         "q": "Is my personal information safe?",
         "a": "Absolutely. Your data is encrypted and never shared without your consent. Privacy controls allow you to manage visibility at all times."
-      },
-      {
-        "q": "Can I talk to matches directly?",
-        "a": "Yes. Once interest is accepted, you can start chatting securely within the platform."
       },
       {
         "q": "Do you verify profiles?",
